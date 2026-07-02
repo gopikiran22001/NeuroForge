@@ -21,6 +21,8 @@ public interface TeamRepository extends JpaRepository<Team, UUID> {
 
     List<Team> findByStatus(TeamStatus status);
 
+    Page<Team> findByStatus(TeamStatus status, Pageable pageable);
+
     List<Team> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description);
 
 }
