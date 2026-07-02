@@ -1,7 +1,9 @@
 package com.stdace.neuroforge.security;
 
+import com.stdace.neuroforge.models.RefreshToken;
 import com.stdace.neuroforge.models.User;
 import com.stdace.neuroforge.config.JwtProperties;
+import com.stdace.neuroforge.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Service;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.LinkedHashMap;
@@ -21,13 +25,42 @@ public class JwtService {
 
     private final JwtProperties jwtProperties;
 
+    private final RefreshTokenRepository refreshTokenRepository;
+
 
     public String generateAccessToken(User user) {
         return buildToken(user, jwtProperties.getAccessTokenExpirationSeconds(), "ACCESS");
     }
 
+    private String hashToken(String token) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+
+            return hex.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Failed to hash refresh token", e);
+        }
+    }
+
     public String generateRefreshToken(User user) {
-        return buildToken(user, jwtProperties.getRefreshTokenExpirationSeconds(), "REFRESH");
+        String token =  buildToken(user, jwtProperties.getRefreshTokenExpirationSeconds(), "REFRESH");
+
+        RefreshToken refreshToken = refreshTokenRepository
+                .findByUserId(user.getId())
+                .orElse(new RefreshToken());
+
+        refreshToken.setUser(user);
+        refreshToken.setToken(hashToken(token));
+
+        refreshTokenRepository.save(refreshToken);
+
+        return token;
     }
 
     public String extractUsername(String token) {
@@ -35,6 +68,9 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
+        if(isRefreshToken(token) && !refreshTokenRepository.findByToken(hashToken(token))) {
+            return false;
+        }
         return extractUsername(token).equalsIgnoreCase(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
