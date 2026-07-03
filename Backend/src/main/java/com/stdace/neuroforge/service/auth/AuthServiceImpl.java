@@ -1,6 +1,7 @@
 package com.stdace.neuroforge.service.auth;
 
 import com.stdace.neuroforge.enums.UserStatus;
+import com.stdace.neuroforge.models.RefreshToken;
 import com.stdace.neuroforge.models.User;
 import com.stdace.neuroforge.dto.auth.AuthResponse;
 import com.stdace.neuroforge.dto.auth.LoginRequest;
@@ -9,10 +10,13 @@ import com.stdace.neuroforge.dto.auth.RegisterRequest;
 import com.stdace.neuroforge.exception.BusinessException;
 import com.stdace.neuroforge.exception.UnauthorizedException;
 import com.stdace.neuroforge.mapper.UserMapper;
+import com.stdace.neuroforge.repository.RefreshTokenRepository;
 import com.stdace.neuroforge.repository.UserRepository;
+import com.stdace.neuroforge.security.CurrentUserUtil;
 import com.stdace.neuroforge.security.JwtService;
 import com.stdace.neuroforge.security.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +25,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final CookieUtil cookieUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -87,6 +94,16 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
 
         return buildAuthResponse(user);
+    }
+
+    public void logout(HttpServletResponse response) {
+        UUID userId = CurrentUserUtil.getCurrentUserId();
+        if (userId != null) {
+            RefreshToken refreshToken =  refreshTokenRepository.findByUserId(userId)
+                    .orElseThrow(() -> new UnauthorizedException("Refresh token not found for user"));
+            refreshTokenRepository.delete(refreshToken);
+        }
+        cookieUtil.clearAuthenticationCookies(response);
     }
 
     private AuthResponse buildAuthResponse(User user) {

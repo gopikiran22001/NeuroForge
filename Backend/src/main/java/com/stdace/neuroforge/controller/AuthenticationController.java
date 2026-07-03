@@ -70,7 +70,7 @@ public class AuthenticationController {
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(HttpServletResponse response) {
         // Clear authentication cookies
-        cookieUtil.clearAuthenticationCookies(response);
+        authService.logout(response);
         return ResponseEntity.ok(ApiResponse.success("Logged out successfully", null));
     }
 }

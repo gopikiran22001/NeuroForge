@@ -5,6 +5,7 @@ import com.stdace.neuroforge.dto.auth.LoginRequest;
 import com.stdace.neuroforge.dto.auth.RefreshTokenRequest;
 import com.stdace.neuroforge.dto.auth.RegisterRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
 
@@ -16,6 +17,8 @@ public interface AuthService {
 
     // New method to refresh token from HTTP request (extracts from cookies)
     AuthResponse refreshToken(HttpServletRequest request);
+
+    void logout(HttpServletResponse response);
 }
 
 
