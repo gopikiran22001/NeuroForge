@@ -5,6 +5,7 @@ import com.stdace.neuroforge.common.PageResponse;
 import com.stdace.neuroforge.dto.user.UserRequest;
 import com.stdace.neuroforge.dto.user.UserResponse;
 import com.stdace.neuroforge.enums.UserRole;
+import com.stdace.neuroforge.enums.UserStatus;
 import com.stdace.neuroforge.exception.ResourceNotFoundException;
 import com.stdace.neuroforge.security.CurrentUserUtil;
 import com.stdace.neuroforge.service.user.UserService;
@@ -41,15 +42,15 @@ public class UserController {
     public ResponseEntity<ApiResponse<?>> search(
             @RequestParam(required = false) UUID id,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String role,
+            @RequestParam(required = false) UserStatus status,
+            @RequestParam(required = false) UserRole role,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
         if(id != null) {
             return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", userService.getById(id)));
         }
-        return ResponseEntity.ok(ApiResponse.success("Users retrieved successfully", userService.search(null, null, null, page, size)));
+        return ResponseEntity.ok(ApiResponse.success("Users retrieved successfully", userService.search(search, status, role, page, size)));
     }
 
     @PutMapping

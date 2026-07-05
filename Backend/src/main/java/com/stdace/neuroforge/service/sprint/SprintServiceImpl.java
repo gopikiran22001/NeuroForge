@@ -52,7 +52,12 @@ public class SprintServiceImpl implements SprintService {
     @Transactional(readOnly = true)
     public PageResponse<SprintResponse> search(String search, SprintStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<SprintResponse> mapped = sprintRepository.findAll(pageable).map(sprintMapper::toResponse);
+        Page<SprintResponse> mapped = null;
+        if (status != null) {
+            mapped = sprintRepository.findByStatus(status, pageable).map(sprintMapper::toResponse);
+        } else {
+            mapped = sprintRepository.findAll(pageable).map(sprintMapper::toResponse);
+        }
         return PageResponse.from(mapped);
     }
 
@@ -60,7 +65,12 @@ public class SprintServiceImpl implements SprintService {
     @Transactional(readOnly = true)
     public PageResponse<SprintResponse> search(String search, UUID projectId, SprintStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<SprintResponse> mapped = sprintRepository.findByProjectId(projectId, pageable).map(sprintMapper::toResponse);
+        Page<SprintResponse> mapped = null;
+        if (status != null) {
+            mapped = sprintRepository.findByProjectIdAndStatus(projectId, status, pageable).map(sprintMapper::toResponse);
+        } else {
+            mapped = sprintRepository.findByProjectId(projectId, pageable).map(sprintMapper::toResponse);
+        }
         return PageResponse.from(mapped);
     }
 

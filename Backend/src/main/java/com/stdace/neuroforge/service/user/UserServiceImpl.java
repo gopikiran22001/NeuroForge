@@ -47,6 +47,14 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public PageResponse<UserResponse> search(String search, UserStatus status, UserRole role, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        if(role != null && status != null) {
+            return PageResponse.from(userRepository.findByRoleAndStatus(role, status, pageable).map(userMapper::toResponse));
+        } else if (role != null) {
+            return PageResponse.from(userRepository.findByRole(role, pageable).map(userMapper::toResponse));
+        } else if (status != null) {
+            return PageResponse.from(userRepository.findByStatus(status, pageable).map(userMapper::toResponse));
+
+        }
         return PageResponse.from(userRepository.findAll(pageable).map(userMapper::toResponse));
     }
 

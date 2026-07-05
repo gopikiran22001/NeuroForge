@@ -46,7 +46,12 @@ public class MilestoneServiceImpl implements MilestoneService {
     @Transactional(readOnly = true)
     public PageResponse<MilestoneResponse> search(String search, MilestoneStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<MilestoneResponse> mapped = milestoneRepository.findAll(pageable).map(milestoneMapper::toResponse);
+        Page<MilestoneResponse> mapped = null;
+        if (status != null) {
+            mapped = milestoneRepository.findByStatus(status, pageable).map(milestoneMapper::toResponse);
+        } else {
+            mapped = milestoneRepository.findAll(pageable).map(milestoneMapper::toResponse);
+        }
         return PageResponse.from(mapped);
     }
 
@@ -54,7 +59,12 @@ public class MilestoneServiceImpl implements MilestoneService {
     @Transactional(readOnly = true)
     public PageResponse<MilestoneResponse> search(String search, UUID projectId, MilestoneStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<MilestoneResponse> mapped = milestoneRepository.findByProjectId(projectId,pageable).map(milestoneMapper::toResponse);
+        Page<MilestoneResponse> mapped = null;
+        if (status != null) {
+            mapped = milestoneRepository.findByProjectIdAndStatus(projectId,status,pageable).map(milestoneMapper::toResponse);
+        } else {
+            mapped = milestoneRepository.findByProjectId(projectId, pageable).map(milestoneMapper::toResponse);
+        }
         return PageResponse.from(mapped);
     }
 

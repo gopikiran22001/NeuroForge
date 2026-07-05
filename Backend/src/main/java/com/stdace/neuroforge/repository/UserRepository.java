@@ -3,6 +3,9 @@ package com.stdace.neuroforge.repository;
 import com.stdace.neuroforge.enums.UserRole;
 import com.stdace.neuroforge.enums.UserStatus;
 import com.stdace.neuroforge.models.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -17,12 +20,18 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     List<User> findByStatus(UserStatus status);
 
+    Page<User> findByStatus(UserStatus status, Pageable pageable);
+
     List<User> findByRole(UserRole role);
+
+    Page<User> findByRole(UserRole role, Pageable pageable);
 
     List<User> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
             String firstName,
             String lastName,
             String email
     );
+
+    Page<User> findByRoleAndStatus(UserRole role, UserStatus status, Pageable pageable);
 }
 

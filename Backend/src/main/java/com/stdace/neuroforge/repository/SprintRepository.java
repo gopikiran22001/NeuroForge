@@ -22,6 +22,10 @@ public interface SprintRepository extends JpaRepository<Sprint, UUID> {
 
     List<Sprint> findByStatus(SprintStatus status);
 
+    Page<Sprint> findByStatus(SprintStatus status, Pageable pageable);
+
+    Page<Sprint> findByProjectIdAndStatus(UUID projectId, SprintStatus status, Pageable pageable);
+
     List<Sprint> findByNameContainingIgnoreCase(String name);
 
     Page<Sprint> findByProjectId(UUID projectId, Pageable pageable);
