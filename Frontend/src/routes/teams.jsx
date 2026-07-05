@@ -260,14 +260,16 @@ function TeamsPage() {
                     >
                       <Edit2 className="size-3.5 mr-1" /> Edit
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => handleDelete(t.id)}
-                    >
-                      <Trash2 className="size-3.5 mr-1" /> Delete
-                    </Button>
+                    {currentUser.role === "admin" && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => handleDelete(t.id)}
+                      >
+                        <Trash2 className="size-3.5 mr-1" /> Delete
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>

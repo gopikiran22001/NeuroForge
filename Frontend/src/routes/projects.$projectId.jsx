@@ -89,7 +89,7 @@ function ProjectDetail() {
   const [selectedTeams, setSelectedTeams] = useState([]);
   const [status, setStatus] = useState("ACTIVE");
 
-  const canEdit = currentUser?.role === "admin" || currentUser?.role === "pm";
+  const canEdit = currentUser?.role === "admin";
 
   // Resolve assigned teams
   const projectTeamIds = rawProject.teamIds ? Array.from(rawProject.teamIds) : [];
@@ -156,7 +156,7 @@ function ProjectDetail() {
       case "DEVELOPER":
         return "Software Engineer";
       case "TESTER":
-        return "QA Engineer";
+        return "Tester";
       case "DEVOPS_ENGINEER":
         return "DevOps Engineer";
       default:

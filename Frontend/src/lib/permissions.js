@@ -2,7 +2,7 @@ export const ROLE_LABEL = {
   admin: "Administrator",
   pm: "Project Manager",
   developer: "Developer",
-  tester: "QA Engineer",
+  tester: "Tester",
   devops: "DevOps Engineer",
 };
 const MATRIX = {
@@ -17,11 +17,33 @@ const MATRIX = {
     "deploy",
     "run_tests",
     "view_billing",
+    "create_task",
+    "create_branch",
+    "log_bug",
+    "run_test_suite",
+    "trigger_build"
   ],
-  pm: ["create_project", "invite_users", "start_sprint", "cut_release"],
-  developer: ["run_tests"],
-  tester: ["run_tests"],
-  devops: ["cut_release", "deploy"],
+  pm: [
+    "invite_users",
+    "start_sprint",
+    "cut_release",
+    "create_task",
+    "log_bug"
+  ],
+  developer: [
+    "run_tests",
+    "create_task",
+    "create_branch"
+  ],
+  tester: [
+    "run_test_suite",
+    "log_bug"
+  ],
+  devops: [
+    "cut_release",
+    "deploy",
+    "trigger_build"
+  ],
 };
 export function can(role, action) {
   return MATRIX[role].includes(action);

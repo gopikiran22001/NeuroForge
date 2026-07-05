@@ -55,7 +55,7 @@ function getTitleForRole(role) {
     case "developer":
       return "Senior Developer";
     case "tester":
-      return "QA Engineer";
+      return "Tester";
     case "devops":
       return "DevOps Engineer";
     default:

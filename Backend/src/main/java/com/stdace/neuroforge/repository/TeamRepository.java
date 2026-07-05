@@ -6,6 +6,8 @@ import com.stdace.neuroforge.models.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,14 +17,34 @@ public interface TeamRepository extends JpaRepository<Team, UUID> {
 
     boolean existsByNameIgnoreCase(String name);
 
-    Optional<Team> findByTeamLeaderAndStatus(User teamLeader, TeamStatus status);
-
-    List<Team> findByMembersContainingAndStatus(User member, TeamStatus status);
-
-    List<Team> findByStatus(TeamStatus status);
-
     Page<Team> findByStatus(TeamStatus status, Pageable pageable);
 
-    List<Team> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description);
+    @Query("""
+    SELECT DISTINCT t
+    FROM Team t
+    LEFT JOIN t.members m
+    WHERE t.teamLeader.id = :userId
+       OR m.id = :userId
+""")
+    Page<Team> findByUserId(
+            @Param("userId") UUID userId,
+            Pageable pageable
+    );
+
+    @Query("""
+    SELECT DISTINCT t
+    FROM Team t
+    LEFT JOIN t.members m
+    WHERE (
+            t.teamLeader.id = :userId
+         OR m.id = :userId
+    )
+    AND t.status = :status
+""")
+    Page<Team> findByUserIdAndStatus(
+            @Param("userId") UUID userId,
+            @Param("status") TeamStatus status,
+            Pageable pageable
+    );
 
 }

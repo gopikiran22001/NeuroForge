@@ -41,7 +41,7 @@ function SprintsPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("ACTIVE");
   const [projectFilter, setProjectFilter] = useState("ALL");
 
   // Dialog state

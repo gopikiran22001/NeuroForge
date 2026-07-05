@@ -5,6 +5,8 @@ import com.stdace.neuroforge.common.PageResponse;
 import com.stdace.neuroforge.dto.sprint.SprintRequest;
 import com.stdace.neuroforge.dto.sprint.SprintResponse;
 import com.stdace.neuroforge.enums.SprintStatus;
+import com.stdace.neuroforge.enums.UserRole;
+import com.stdace.neuroforge.security.CurrentUserUtil;
 import com.stdace.neuroforge.service.sprint.SprintService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +26,17 @@ public class SprintController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','PROJECT_MANAGER')")
     public ResponseEntity<ApiResponse<SprintResponse>> create(@Valid @RequestBody SprintRequest request) {
+        if(CurrentUserUtil.getCurrentUserRole().equals(UserRole.PROJECT_MANAGER)){
+            sprintService.managerCheck(CurrentUserUtil.getCurrentUserId(), request);
+        }
         return ResponseEntity.ok(ApiResponse.success("Sprint created successfully", sprintService.create(request)));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<SprintResponse>> getById(@PathVariable UUID id) {
+        if(!CurrentUserUtil.getCurrentUserRole().equals(UserRole.ADMIN)) {
+            return ResponseEntity.ok(ApiResponse.success("Sprint retrieved successfully", sprintService.getById(CurrentUserUtil.getCurrentUserId(), id)));
+        }
         return ResponseEntity.ok(ApiResponse.success("Sprint retrieved successfully", sprintService.getById(id)));
     }
 
@@ -40,6 +48,13 @@ public class SprintController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
+        if(!CurrentUserUtil.getCurrentUserRole().equals(UserRole.ADMIN)) {
+            UUID userId = CurrentUserUtil.getCurrentUserId();
+            if(projectId != null){
+                return ResponseEntity.ok(ApiResponse.success("Sprints retrieved successfully", sprintService.search(userId, search, projectId, status, page, size)));
+            }
+            return ResponseEntity.ok(ApiResponse.success("Sprints retrieved successfully", sprintService.search(userId, search, status, page, size)));
+        }
         if(projectId != null){
             return ResponseEntity.ok(ApiResponse.success("Sprints retrieved successfully", sprintService.search(search, projectId, status, page, size)));
         }
@@ -50,12 +65,18 @@ public class SprintController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROJECT_MANAGER')")
     public ResponseEntity<ApiResponse<SprintResponse>> update(@PathVariable UUID id, @Valid @RequestBody SprintRequest request) {
+        if(CurrentUserUtil.getCurrentUserRole().equals(UserRole.PROJECT_MANAGER)){
+            sprintService.managerCheck(CurrentUserUtil.getCurrentUserId(), id);
+        }
         return ResponseEntity.ok(ApiResponse.success("Sprint updated successfully", sprintService.update(id, request)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','PROJECT_MANAGER')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
+        if(CurrentUserUtil.getCurrentUserRole().equals(UserRole.PROJECT_MANAGER)){
+            sprintService.managerCheck(CurrentUserUtil.getCurrentUserId(), id);
+        }
         sprintService.delete(id);
         return ResponseEntity.ok(ApiResponse.success("Sprint deleted successfully", null));
     }

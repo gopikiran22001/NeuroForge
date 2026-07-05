@@ -3,6 +3,7 @@ package com.stdace.neuroforge.service.project;
 import com.stdace.neuroforge.enums.ProjectStatus;
 import com.stdace.neuroforge.enums.TeamStatus;
 import com.stdace.neuroforge.enums.UserStatus;
+import com.stdace.neuroforge.exception.ForbiddenException;
 import com.stdace.neuroforge.models.Project;
 import com.stdace.neuroforge.models.Team;
 import com.stdace.neuroforge.models.User;
@@ -57,9 +58,41 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
+    public ProjectResponse getById(UUID userId,UUID id) {
+        if(!checkUser(userId, id)) {
+            throw new ForbiddenException("User does not have access to this project");
+        }
+        return projectRepository.findById(id).map(projectMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + id));
+    }
+
+    private boolean checkUser(UUID userId, UUID id) {
+        return projectRepository.existsByProjectAndUser(id, userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public PageResponse<ProjectResponse> search(String search, ProjectStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<ProjectResponse> mapped = projectRepository.findAll(pageable).map(projectMapper::toResponse);
+        Page<ProjectResponse> mapped = null;
+        if(status != null) {
+            mapped = projectRepository.findByStatus(status, pageable).map(projectMapper::toResponse);
+        } else {
+            mapped = projectRepository.findAll(pageable).map(projectMapper::toResponse);
+        }
+        return PageResponse.from(mapped);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<ProjectResponse> search(UUID userId, String search, ProjectStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ProjectResponse> mapped = null;
+        if(status != null) {
+            mapped = projectRepository.findMyProjectsByStatus(userId, status, pageable).map(projectMapper::toResponse);
+        } else {
+            mapped = projectRepository.findMyProjects(userId, pageable).map(projectMapper::toResponse);
+        }
         return PageResponse.from(mapped);
     }
 
@@ -116,4 +149,5 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException("Project end date must be after start date");
         }
     }
+
 }

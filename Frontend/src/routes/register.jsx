@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Hexagon, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { NeuroForgeLogo } from "@/components/neuroforge-logo";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
@@ -67,8 +68,8 @@ function RegisterPage() {
       {/* Brand panel */}
       <div className="hidden lg:flex relative flex-col justify-between bg-foreground text-background p-10 overflow-hidden">
         <div className="flex items-center gap-2">
-          <div className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground">
-            <Hexagon className="size-4" />
+          <div className="grid size-8 place-items-center shrink-0">
+            <NeuroForgeLogo className="size-7" />
           </div>
           <div className="font-display text-lg">NeuroForge Nexus</div>
         </div>
@@ -103,8 +104,8 @@ function RegisterPage() {
       <div className="flex items-center justify-center p-8 overflow-y-auto">
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground">
-              <Hexagon className="size-4" />
+            <div className="grid size-8 place-items-center shrink-0">
+              <NeuroForgeLogo className="size-7 text-primary" />
             </div>
             <div className="font-display text-lg">NeuroForge Nexus</div>
           </div>

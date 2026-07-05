@@ -12,34 +12,123 @@ import org.springframework.data.repository.query.Param;
 
 import org.springframework.data.domain.Pageable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MilestoneRepository extends JpaRepository<Milestone, UUID> {
 
-    List<Milestone> findByProject(Project project);
-
     Page<Milestone> findByProjectId(UUID projectId, Pageable pageable);
-
-    List<Milestone> findByProjectAndStatus(Project project, MilestoneStatus status);
-
-    boolean existsByProjectAndStatus(Project project, MilestoneStatus status);
 
     Page<Milestone> findByStatus(MilestoneStatus status, Pageable pageable);
 
-    List<Milestone> findByNameContainingIgnoreCase(String name);
-
     @Query("""
-        SELECT COUNT(t) > 0
-        FROM Milestone m
-        JOIN m.project p
-        JOIN p.teams t
-        WHERE m.id = :milestoneId
-          AND t.teamLeader.id = :userId
-    """)
-    boolean isTeamLeadForMilestoneProject(
+    SELECT COUNT(DISTINCT m) > 0
+    FROM Milestone m
+    JOIN m.project p
+    LEFT JOIN p.teams t
+    WHERE m.id = :milestoneId
+      AND (
+            p.projectManager.id = :userId
+         OR t.teamLeader.id = :userId
+      )
+""")
+    boolean isProjectManagerOrTeamLeadForMilestoneProject(
             @Param("milestoneId") UUID milestoneId,
             @Param("userId") UUID userId
     );
 
     Page<Milestone> findByProjectIdAndStatus(UUID projectId, MilestoneStatus status, Pageable pageable);
+
+    @Query("""
+    SELECT DISTINCT m
+    FROM Milestone m
+    JOIN m.project p
+    LEFT JOIN p.teams t
+    LEFT JOIN t.members member
+    WHERE m.id = :milestoneId
+      AND (
+            p.projectManager.id = :userId
+         OR t.teamLeader.id = :userId
+         OR member.id = :userId
+      )
+""")
+    Optional<Milestone> findByIdAndUserId(
+            @Param("milestoneId") UUID milestoneId,
+            @Param("userId") UUID userId
+    );
+
+    @Query("""
+    SELECT DISTINCT m
+    FROM Milestone m
+    JOIN m.project p
+    LEFT JOIN p.teams t
+    LEFT JOIN t.members member
+    WHERE p.projectManager.id = :userId
+       OR t.teamLeader.id = :userId
+       OR member.id = :userId
+""")
+    Page<Milestone> findByUserId(
+            @Param("userId") UUID userId,
+            Pageable pageable
+    );
+
+    @Query("""
+    SELECT DISTINCT m
+    FROM Milestone m
+    JOIN m.project p
+    LEFT JOIN p.teams t
+    LEFT JOIN t.members member
+    WHERE (
+            p.projectManager.id = :userId
+         OR t.teamLeader.id = :userId
+         OR member.id = :userId
+    )
+    AND m.status = :status
+""")
+    Page<Milestone> findByUserIdAndStatus(
+            @Param("userId") UUID userId,
+            @Param("status") MilestoneStatus status,
+            Pageable pageable
+    );
+
+    @Query("""
+    SELECT DISTINCT m
+    FROM Milestone m
+    JOIN m.project p
+    LEFT JOIN p.teams t
+    LEFT JOIN t.members member
+    WHERE p.id = :projectId
+      AND (
+            p.projectManager.id = :userId
+         OR t.teamLeader.id = :userId
+         OR member.id = :userId
+      )
+""")
+    Page<Milestone> findByProjectIdAndUserId(
+            @Param("projectId") UUID projectId,
+            @Param("userId") UUID userId,
+            Pageable pageable
+    );
+
+    @Query("""
+    SELECT DISTINCT m
+    FROM Milestone m
+    JOIN m.project p
+    LEFT JOIN p.teams t
+    LEFT JOIN t.members member
+    WHERE p.id = :projectId
+      AND (
+            p.projectManager.id = :userId
+         OR t.teamLeader.id = :userId
+         OR member.id = :userId
+      )
+      AND m.status = :status
+""")
+    Page<Milestone> findByProjectIdAndUserIdAndStatus(
+            @Param("projectId") UUID projectId,
+            @Param("userId") UUID userId,
+            @Param("status") MilestoneStatus status,
+            Pageable pageable
+    );
+
 }

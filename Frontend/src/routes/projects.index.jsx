@@ -65,7 +65,7 @@ function ProjectList() {
   const [status, setStatus] = useState("ACTIVE");
   const [teamSearch, setTeamSearch] = useState("");
 
-  const canEdit = currentUser.role === "admin" || currentUser.role === "pm";
+  const canEdit = currentUser.role === "admin";
 
   const fetchProjects = async () => {
     setLoading(true);

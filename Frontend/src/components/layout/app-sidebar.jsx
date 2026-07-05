@@ -16,7 +16,6 @@ import {
   FileClock,
   BarChart3,
   Settings,
-  Hexagon,
 } from "lucide-react";
 import {
   Sidebar,
@@ -32,6 +31,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useSession } from "@/lib/session";
+import { NeuroForgeLogo } from "@/components/neuroforge-logo";
 const NAV = [
   {
     label: "Overview",
@@ -80,12 +80,25 @@ export function AppSidebar() {
   const { user } = useSession();
   const isActive = (path) =>
     path === "/" ? pathname === "/" : pathname === path || pathname.startsWith(path + "/");
+  const filteredNav = NAV.map((group) => {
+    const items = group.items.filter((item) => {
+      if (item.url === "/users") {
+        return user?.role === "admin" || user?.role === "pm";
+      }
+      if (item.url === "/roles" || item.url === "/audit-log") {
+        return user?.role === "admin";
+      }
+      return true;
+    });
+    return { ...group, items };
+  }).filter((group) => group.items.length > 0);
+
   return (
     <Sidebar collapsible="icon" className="border-r hairline">
       <SidebarHeader className="border-b hairline">
         <div className="flex items-center gap-2 px-1 py-1">
-          <div className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground shrink-0">
-            <Hexagon className="size-4" />
+          <div className="grid size-8 place-items-center shrink-0 text-primary">
+            <NeuroForgeLogo className="size-7" />
           </div>
           {!collapsed && (
             <div className="min-w-0">
@@ -96,7 +109,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="[&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]">
-        {NAV.map((group) => (
+        {filteredNav.map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/70">
               {group.label}

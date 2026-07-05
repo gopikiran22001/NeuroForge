@@ -13,7 +13,13 @@ public interface ProjectService {
 
     ProjectResponse getById(UUID id);
 
+    ProjectResponse getById(UUID userI, UUID id);
+
     PageResponse<ProjectResponse> search(String search, ProjectStatus status, int page, int size);
+
+    PageResponse<ProjectResponse> search(UUID userId, String search, ProjectStatus status, int page, int size);
+
+
 
     ProjectResponse update(UUID id, ProjectRequest request);
 
