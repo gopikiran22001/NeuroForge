@@ -3,7 +3,7 @@ import Navbar from "../components/layout/Navbar";
 
 function MainLayout({ children }) {
     return (
-        <div style={{ display: "flex", height: "100vh" }}>
+        <div style={{ display: "flex", minHeight: "100vh" }}>
             <Sidebar />
 
             <div style={{ flex: 1 }}>
