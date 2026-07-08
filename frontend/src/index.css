@@ -6,8 +6,9 @@
 }
 
 body {
-    background-color: #f5f7fa;
-    color: #1e293b;
+    background: radial-gradient(circle at 10% 20%, rgb(15, 23, 42) 0%, rgb(20, 18, 55) 90%);
+    color: #f8fafc;
+    min-height: 100vh;
 }
 
 a {

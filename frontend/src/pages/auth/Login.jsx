@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { login } from "../../services/authService";
 import { useAuth } from "../../context/AuthContext";
 import "./Login.css";
@@ -28,25 +28,16 @@ function Login() {
 
         try {
             const response = await login(formData);
-
-            console.log(response.data);
-
-            // Save logged-in user
             setUser(response.data.data.user);
-
             alert("Login Successful");
-
             navigate("/dashboard");
-
         } catch (error) {
             console.error(error);
-
             if (error.response) {
                 alert(error.response.data.message);
             } else {
                 alert("Unable to connect to server.");
             }
-
         } finally {
             setLoading(false);
         }
@@ -55,39 +46,46 @@ function Login() {
     return (
         <div className="login-container">
             <div className="login-card">
+                <div className="login-brand">
+                    <div className="brand-logo">N</div>
+                    <h1>NeuroForge</h1>
+                </div>
 
-                <h1>NeuroForge Nexus</h1>
+                <p className="login-subtitle">Nexus Portal Access</p>
 
-                <p>Sign in to continue</p>
+                <form onSubmit={handleSubmit} className="login-form">
+                    <div className="input-group">
+                        <label>Email Address</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Enter email"
+                            required
+                        />
+                    </div>
 
-                <form onSubmit={handleSubmit}>
+                    <div className="input-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="Enter password"
+                            required
+                        />
+                    </div>
 
-                    <label>Email</label>
-
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="Enter email"
-                    />
-
-                    <label>Password</label>
-
-                    <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        placeholder="Enter password"
-                    />
-
-                    <button type="submit" disabled={loading}>
-                        {loading ? "Logging in..." : "Login"}
+                    <button type="submit" className="login-btn" disabled={loading}>
+                        {loading ? "Verifying..." : "Sign In"}
                     </button>
-
                 </form>
 
+                <div className="auth-links">
+                    <p>Don't have an account? <Link to="/register" className="auth-link">Register here</Link></p>
+                </div>
             </div>
         </div>
     );

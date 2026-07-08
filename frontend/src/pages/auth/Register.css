@@ -1,0 +1,20 @@
+@import "./Login.css";
+
+.register-card {
+    max-width: 480px;
+}
+
+.register-card select {
+    transition: all 0.2s ease;
+}
+
+.register-card select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    background: rgba(15, 23, 42, 0.8);
+}
+
+.register-card select option {
+    background: #1e293b;
+    color: #ffffff;
+}

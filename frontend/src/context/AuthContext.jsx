@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getProfile } from "../services/userService";
+import api from "../services/api";
 
 const AuthContext = createContext();
 
@@ -25,6 +26,23 @@ export function AuthProvider({ children }) {
 
         loadUser();
 
+    }, []);
+
+    // Response interceptor to handle 401 Unauthorized globally
+    useEffect(() => {
+        const interceptor = api.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response && error.response.status === 401) {
+                    setUser(null);
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        return () => {
+            api.interceptors.response.eject(interceptor);
+        };
     }, []);
 
     return (

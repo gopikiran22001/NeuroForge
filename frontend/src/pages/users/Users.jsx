@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import { getUsers, createUser } from "../../services/userService";
-import UserModal from "../../components/users/UserModal";
+import Modal from "../../components/common/Modal";
 import UserForm from "../../components/users/UserForm";
 import "./Users.css";
 
@@ -130,7 +130,11 @@ function Users() {
 
                                     <td>{user.role}</td>
 
-                                    <td>{user.status}</td>
+                                    <td>
+                                        <span className={`status-badge ${user.status.toLowerCase()}`}>
+                                            {user.status}
+                                        </span>
+                                    </td>
 
                                     <td>
 
@@ -173,7 +177,7 @@ function Users() {
 
             {showModal && (
 
-                <UserModal
+                <Modal
                     title="Create User"
                     onClose={() => setShowModal(false)}
                 >
@@ -182,7 +186,7 @@ function Users() {
                         onSubmit={handleCreateUser}
                     />
 
-                </UserModal>
+                </Modal>
 
             )}
 
